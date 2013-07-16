@@ -35,13 +35,33 @@ public class Jdbc {
 	
 	public static ResultSet executeSelect(String sql){
 		ResultSet rs = null;
+		Connection con = getConnection();
 		try {
-			Connection con = getConnection();
 			rs = con.prepareStatement(sql).executeQuery();
+			return rs;
 		} catch (Exception e) {
 			e.printStackTrace();
+		}finally{
+			//CloseCon(con);
 		}
-		return rs;
+		return null;
+	}
+	
+	public static boolean executeInsert(String sql , Object[] objs){
+		Connection con = getConnection();
+		try {
+			PreparedStatement ps = con.prepareStatement(sql);
+			for (int i = 0; i < objs.length; i++) {
+				ps.setString(i+1, (String) objs[i]);
+			}
+			return ps.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally{
+			CloseCon(con);
+		}
+		
 	}
 	
 	
@@ -77,4 +97,11 @@ public class Jdbc {
 		jdbc.excuteSql(sql, list);
 	}
 	
+	protected static void CloseCon(Connection con){
+		try {
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
